@@ -1,8 +1,9 @@
 class ReminderModel {
-  
+  ReminderModel({
+    required this.title,
+    this.isCompleted = false,
+  });
+
   final String title;
-  final bool isCompleted = false;
-
-  ReminderModel({ required this.title });
-
+  final bool isCompleted;
 }
