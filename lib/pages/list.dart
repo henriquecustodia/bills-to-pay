@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reminder/services/store.dart';
 import '../models/reminder.dart';
 
 class ListPage extends StatefulWidget {
@@ -11,14 +12,6 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  List<ReminderModel> reminders = [];
-
-  void addReminder(ReminderModel reminder) {
-    setState(() {
-      reminders.add(reminder);
-    });
-  }
-
   void toggleTheCompletedReminderState(ReminderModel reminder, int index) {
     setState(() {
       var newReminder = ReminderModel(
@@ -26,14 +19,19 @@ class _ListPageState extends State<ListPage> {
         isCompleted: !reminder.isCompleted,
       );
 
-      reminders.replaceRange(index, index + 1, [newReminder]);
+      Store().list().replaceRange(index, index + 1, [newReminder]);
+    });
+  }
+
+  void removeItem(ReminderModel reminder) {
+    setState(() {
+      Store().remove(reminder);
     });
   }
 
   void toCreate() async {
-    final reminder = await Navigator.pushNamed(context, 'create') as ReminderModel;
-
-    addReminder(reminder);
+    await Navigator.pushNamed(context, 'create');
+    setState(() {});
   }
 
   FloatingActionButton createFloatingButton() {
@@ -46,6 +44,8 @@ class _ListPageState extends State<ListPage> {
 
   @override
   Widget build(BuildContext context) {
+    var reminders = Store().list();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -63,6 +63,9 @@ class _ListPageState extends State<ListPage> {
                   onChange: (value) {
                     toggleTheCompletedReminderState(reminder, index);
                   },
+                  onRemove: (reminder) {
+                    removeItem(reminder);
+                  },
                 );
               },
             ),
@@ -75,36 +78,86 @@ class _ListPageState extends State<ListPage> {
 }
 
 class ListItem extends StatelessWidget {
-  const ListItem({
+  ListItem({
     Key? key,
     required this.reminder,
     required this.onChange,
+    required this.onRemove,
   }) : super(key: key);
 
   final ReminderModel reminder;
-  final Function(bool)? onChange;
+  final Function(bool) onChange;
+  Function(ReminderModel) onRemove;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.amber,
-      height: 100,
       margin: const EdgeInsets.all(24),
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Flex(
-          direction: Axis.horizontal,
+        child: Column(
           children: [
-            Expanded(child: Text(reminder.title)),
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Checkbox(
-                  value: reminder.isCompleted,
-                  onChanged: (value) {
-                    onChange!(value!);
-                  },
+            Flex(
+              direction: Axis.horizontal,
+              children: [
+                Expanded(
+                  child: Text(reminder.title),
                 ),
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Checkbox(
+                        value: reminder.isCompleted,
+                        onChanged: (value) {
+                          onChange!(value!);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 16),
+              child: Flex(
+                direction: Axis.horizontal,
+                children: [
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                            ),
+                            onPressed: () => {
+                              Navigator.pushNamed(context, '/change-reminder'),
+                            },
+                            child: const Text('Editar'),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(left: 8),
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                ),
+                                onPressed: () => {
+                                      onRemove(reminder),
+                                    },
+                                child: const Text('Excluir')),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reminder/services/store.dart';
 import '../models/reminder.dart';
 
 class CreateReminder extends StatefulWidget {
@@ -47,10 +48,10 @@ class _CreateReminderState extends State<CreateReminder> {
                       height: 40,
                       child: ElevatedButton(
                         onPressed: () => {
-                          Navigator.pop(
-                            context,
+                          Store().add(
                             ReminderModel(title: titleController.value.text),
-                          )
+                          ),
+                          Navigator.pop(context)
                         },
                         child: const Text('Salvar'),
                       ),
