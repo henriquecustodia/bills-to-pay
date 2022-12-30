@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reminder/models/change-page-arguments.dart';
 import 'package:reminder/services/store.dart';
 import '../models/reminder.dart';
 
@@ -12,26 +13,8 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  void toggleTheCompletedReminderState(ReminderModel reminder, int index) {
-    setState(() {
-      var newReminder = ReminderModel(
-        title: reminder.title,
-        isCompleted: !reminder.isCompleted,
-      );
-
-      Store().list().replaceRange(index, index + 1, [newReminder]);
-    });
-  }
-
-  void removeItem(ReminderModel reminder) {
-    setState(() {
-      Store().remove(reminder);
-    });
-  }
-
   void toCreate() async {
     await Navigator.pushNamed(context, 'create');
-    setState(() {});
   }
 
   FloatingActionButton createFloatingButton() {
@@ -43,32 +26,20 @@ class _ListPageState extends State<ListPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    var reminders = Store().list();
+  void dispose() {
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: Column(
-        children: [
+        children: const [
           Expanded(
-            child: ListView.builder(
-              itemCount: reminders.length,
-              itemBuilder: (context, index) {
-                var reminder = reminders[index];
-
-                return ListItem(
-                  reminder: reminder,
-                  onChange: (value) {
-                    toggleTheCompletedReminderState(reminder, index);
-                  },
-                  onRemove: (reminder) {
-                    removeItem(reminder);
-                  },
-                );
-              },
-            ),
+            child: ReminderList(),
           ),
         ],
       ),
@@ -82,11 +53,13 @@ class ListItem extends StatelessWidget {
     Key? key,
     required this.reminder,
     required this.onChange,
+    required this.onEdit,
     required this.onRemove,
   }) : super(key: key);
 
   final ReminderModel reminder;
   final Function(bool) onChange;
+  final Function(ReminderModel) onEdit;
   Function(ReminderModel) onRemove;
 
   @override
@@ -135,7 +108,7 @@ class ListItem extends StatelessWidget {
                               backgroundColor: Colors.white,
                             ),
                             onPressed: () => {
-                              Navigator.pushNamed(context, '/change-reminder'),
+                              onEdit(reminder),
                             },
                             child: const Text('Editar'),
                           ),
@@ -162,6 +135,62 @@ class ListItem extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class ReminderList extends StatelessWidget {
+  const ReminderList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<List<ReminderModel>>(
+      valueListenable: Store(),
+      builder: (context, value, child) {
+        return ListView.builder(
+          itemCount: value.length,
+          itemBuilder: (context, index) {
+            var reminder = value[index];
+
+            return ListItem(
+              reminder: reminder,
+              onChange: (value) {
+                toggleTheCompletedReminderState(reminder, index);
+              },
+              onRemove: (reminder) {
+                removeItem(reminder);
+              },
+              onEdit: (reminder) {
+                toEdit(context, reminder);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void toggleTheCompletedReminderState(ReminderModel reminder, int index) {
+    var newReminder = ReminderModel(
+      title: reminder.title,
+      isCompleted: !reminder.isCompleted,
+      id: reminder.id,
+    );
+
+    Store().edit(newReminder);
+  }
+
+  void removeItem(ReminderModel reminder) {
+    Store().remove(reminder);
+  }
+
+  void toEdit(BuildContext context, ReminderModel reminder) async {
+    await Navigator.pushNamed(
+      context,
+      '/change',
+      arguments: ChangePageArguments(
+        id: reminder.id!,
       ),
     );
   }

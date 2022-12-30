@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reminder/models/change-page-arguments.dart';
 import 'package:reminder/services/store.dart';
 import '../models/reminder.dart';
 
@@ -22,6 +23,14 @@ class _CreateReminderState extends State<CreateReminder> {
 
   @override
   Widget build(BuildContext context) {
+    late ReminderModel reminder;
+
+    if (isEditMode(context)) {
+      ChangePageArguments args = getRouteArgs(context);
+      reminder = getReminderById(args);
+      setData(reminder);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -47,11 +56,22 @@ class _CreateReminderState extends State<CreateReminder> {
                     child: SizedBox(
                       height: 40,
                       child: ElevatedButton(
-                        onPressed: () => {
-                          Store().add(
-                            ReminderModel(title: titleController.value.text),
-                          ),
-                          Navigator.pop(context)
+                        onPressed: () {
+                          if (isEditMode(context)) {
+                            Store().edit(
+                              ReminderModel(
+                                title: titleController.value.text,
+                                isCompleted: reminder.isCompleted,
+                                id: reminder.id,
+                              ),
+                            );
+                          } else {
+                            Store().add(
+                              ReminderModel(title: titleController.value.text),
+                            );
+                          }
+
+                          Navigator.pop(context);
                         },
                         child: const Text('Salvar'),
                       ),
@@ -65,4 +85,23 @@ class _CreateReminderState extends State<CreateReminder> {
       ),
     );
   }
+
+  void setData(ReminderModel reminder) {
+    titleController.value = titleController.value.copyWith(
+      text: reminder.title,
+      selection: TextSelection.collapsed(offset: reminder.title.length),
+    );
+  }
+
+  ReminderModel getReminderById(ChangePageArguments args) {
+    var reminder = Store().getById(args.id);
+    return reminder;
+  }
+
+  ChangePageArguments getRouteArgs(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as ChangePageArguments;
+    return args;
+  }
+
+  bool isEditMode(BuildContext context) => ModalRoute.of(context)!.settings.arguments != null;
 }

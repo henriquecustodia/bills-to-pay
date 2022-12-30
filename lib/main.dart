@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const ListPage(),
         'create': (context) => const CreateReminder(),
+        '/change': (context) => const CreateReminder(),
       },
       initialRoute: '/',
     );
