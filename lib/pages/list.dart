@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reminder/models/change-page-arguments.dart';
-import 'package:reminder/services/store.dart';
+import 'package:reminder/services/selected-month-store.dart';
 import '../models/reminder.dart';
 
 class ListPage extends StatefulWidget {
@@ -84,7 +84,7 @@ class ListItem extends StatelessWidget {
                       Checkbox(
                         value: reminder.isCompleted,
                         onChanged: (value) {
-                          onChange!(value!);
+                          onChange(value!);
                         },
                       ),
                     ],

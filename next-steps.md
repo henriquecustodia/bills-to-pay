@@ -1,7 +1,5 @@
 # Next steps
 
-- Editar reminder
-
 - Persistir lista
 
 - Carregar lista quando app iniciar
