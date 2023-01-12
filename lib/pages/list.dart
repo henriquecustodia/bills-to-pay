@@ -146,7 +146,7 @@ class ReminderList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<List<ReminderModel>>(
-      valueListenable: Store(),
+      valueListenable: SelectedMonthStore(),
       builder: (context, value, child) {
         return ListView.builder(
           itemCount: value.length,
@@ -178,11 +178,11 @@ class ReminderList extends StatelessWidget {
       id: reminder.id,
     );
 
-    Store().edit(newReminder);
+    SelectedMonthStore().edit(newReminder);
   }
 
   void removeItem(ReminderModel reminder) {
-    Store().remove(reminder);
+    SelectedMonthStore().remove(reminder);
   }
 
   void toEdit(BuildContext context, ReminderModel reminder) async {

@@ -4,25 +4,44 @@ import 'package:reminder/models/reminder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Db {
-   
   Future<SharedPreferences> getInstance() async => await SharedPreferences.getInstance();
 
-  getData(String key) async {
-      var pref = await getInstance();
+  Future<List<ReminderModel>?> getData(String key) async {
+    var pref = await getInstance();
 
-      var dataAsString = pref.getString(key) as String;
+    var dataAsString = pref.get(key) as String;
 
-      var decodedData = json.decode(dataAsString) as List;
+    if (dataAsString == '()') {
+      return null;
+    }
 
-      return decodedData.map((e) => ReminderModel.fromJson(e)).toList();
+    var list = jsonDecode(dataAsString) as List;
+
+    return list.map((e) => ReminderModel.fromJson(e)).toList();
   }
 
-  setData(String key, List<ReminderModel> reminders) async {
-      var pref = await getInstance();
+  Future<bool> setData(String key, List<ReminderModel> reminders) async {
+    var pref = await getInstance();
 
-      var remindersAsString = reminders.map((e) => e.toJson()).toString();
-      
-      return pref.setString(key, remindersAsString) as String;
+    var remindersAsString =  jsonEncode(reminders);
+
+    return pref.setString(key, remindersAsString);
   }
 
+  Future<Map<String, List<ReminderModel>>> getAll() async {
+    var pref = await getInstance();
+
+    var keys = pref.getKeys();
+
+    var result = keys.fold({}, (map, currentKey) {
+      var listAsString = pref.getString(currentKey) as String;
+      var reminders = jsonDecode(listAsString) as List<ReminderModel>;
+
+      map.addAll({currentKey: reminders});
+
+      return map;
+    });
+
+    return result as Future<Map<String, List<ReminderModel>>>;
+  }
 }

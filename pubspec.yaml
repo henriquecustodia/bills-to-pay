@@ -39,6 +39,7 @@ dependencies:
   uuid: ^3.0.7
   json_serializable: ^6.5.4
   shared_preferences: ^2.0.15
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:

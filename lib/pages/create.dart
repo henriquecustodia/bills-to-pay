@@ -58,7 +58,7 @@ class _CreateReminderState extends State<CreateReminder> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isEditMode(context)) {
-                            Store().edit(
+                            SelectedMonthStore().edit(
                               ReminderModel(
                                 title: titleController.value.text,
                                 isCompleted: reminder.isCompleted,
@@ -66,7 +66,7 @@ class _CreateReminderState extends State<CreateReminder> {
                               ),
                             );
                           } else {
-                            Store().add(
+                            SelectedMonthStore().add(
                               ReminderModel(title: titleController.value.text),
                             );
                           }
@@ -94,7 +94,7 @@ class _CreateReminderState extends State<CreateReminder> {
   }
 
   ReminderModel getReminderById(ChangePageArguments args) {
-    var reminder = Store().getById(args.id);
+    var reminder = SelectedMonthStore().getById(args.id);
     return reminder;
   }
 

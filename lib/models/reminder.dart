@@ -3,15 +3,20 @@ import 'package:json_annotation/json_annotation.dart';
 
 @JsonSerializable()
 class ReminderModel {
-  ReminderModel({required this.title, this.isCompleted = false, this.id, this.endDate}) {
+  ReminderModel({
+    required this.title,
+    this.isCompleted = false,
+    this.id,
+    this.endDate,
+  }) {
     id ??= const Uuid().v4();
     endDate ??= DateTime.now();
   }
 
   String? id;
   DateTime? endDate;
+  bool isCompleted;
   final String title;
-  final bool isCompleted;
 
   factory ReminderModel.fromJson(Map<String, dynamic> json) => _$ReminderModelFromJson(json);
 
