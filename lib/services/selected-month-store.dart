@@ -53,25 +53,107 @@ class SelectedMonthStore extends ValueNotifier<List<ReminderModel>> {
   //   value.addAll(reminders);
   // }
 
-  init() async {
+  Future<bool> init() async {
     var now = DateTime.now();
 
     selectedMonth = now;
 
-    var formattedDate = toDbKey(now);
-    var reminders = await Db().getData(formattedDate);
+    await Db().setData(
+        toDbKey(
+          now.subtract(Duration(days: 30)),
+        ),
+        [
+          ReminderModel(
+            title: 'test 1',
+            endDate: DateTime(2023, DateTime.april, 20),
+          ),
+          ReminderModel(
+            title: 'test 2',
+            endDate: DateTime(2023, DateTime.november, 20),
+          )
+        ]);
 
-    if (reminders == null) {
-      reminders = [];
-      await Db().setData(formattedDate, reminders);
-    }
+    var reminders = await getOrCreateListInDb(now);
 
     value.addAll(reminders);
 
-    print(await Db().getData(formattedDate));
+    return true;
   }
 
-  toDbKey(DateTime dt) {
+  String toDbKey(DateTime dt) {
     return DateFormat('yyyy-MM').format(dt);
+  }
+
+  Future<List<ReminderModel>> getOrCreateListInDb(DateTime dt) async {
+    var reminders = await Db().getData(toDbKey(dt));
+
+    if (reminders == null) {
+      reminders = await getListFromPreviousMonth(dt) ?? [];
+
+      var copiedReminders = copyReminders(reminders);
+
+      await Db().setData(toDbKey(dt), copiedReminders);
+    }
+
+    return reminders;
+  }
+
+  Future<List<ReminderModel>> createReminderList(DateTime dt) async {
+    var reminders = await getListFromPreviousMonth(dt) ?? [];
+
+    var copiedReminders = copyReminders(reminders);
+
+    await Db().setData(toDbKey(dt), copiedReminders);
+
+    return copiedReminders;
+  }
+
+  Future<List<ReminderModel>?> getListFromPreviousMonth(DateTime dt) async {
+    var hasItems = await Db().hasItems();
+
+    if (!hasItems) {
+      return null;
+    }
+
+    var firstDayOftheMonth = DateTime(dt.year, dt.month, 1);
+
+    while (true) {
+      var previousMonth = firstDayOftheMonth.subtract(const Duration(days: 30));
+      firstDayOftheMonth = DateTime(previousMonth.year, previousMonth.month, 1);
+
+      var hasKey = await Db().hasKey(toDbKey(firstDayOftheMonth));
+
+      if (!hasKey) {
+        continue;
+      }
+
+      return await Db().getData(toDbKey(firstDayOftheMonth));
+    }
+  }
+
+  List<ReminderModel> copyReminders(List<ReminderModel> reminders) {
+    List<ReminderModel> copiedReminders = [];
+
+    reminders.forEach((element) {
+      if (element.endDate == null) {
+        return;
+      }
+
+      var firstDayOfEndDate = DateTime(element.endDate!.year, element.endDate!.month, 1);
+      var firstDayOfSelectedMonth = DateTime(selectedMonth.year, selectedMonth.month, 1);
+
+      if (firstDayOfEndDate.isBefore(firstDayOfSelectedMonth)) {
+        return;
+      }
+
+      copiedReminders.add(
+        ReminderModel(
+          title: element.title,
+          endDate: element.endDate,
+        ),
+      );
+    });
+
+    return copiedReminders;
   }
 }

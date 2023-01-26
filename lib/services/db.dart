@@ -9,13 +9,13 @@ class Db {
   Future<List<ReminderModel>?> getData(String key) async {
     var pref = await getInstance();
 
-    var dataAsString = pref.get(key) as String;
+    var dataAsString = pref.get(key);
 
-    if (dataAsString == '()') {
+    if (dataAsString == null || dataAsString == '()') {
       return null;
     }
 
-    var list = jsonDecode(dataAsString) as List;
+    var list = jsonDecode(dataAsString as String) as List;
 
     return list.map((e) => ReminderModel.fromJson(e)).toList();
   }
@@ -44,4 +44,17 @@ class Db {
 
     return result as Future<Map<String, List<ReminderModel>>>;
   }
+  
+  Future<bool> hasItems() async {
+    var pref = await getInstance();
+    var keys = pref.getKeys();
+
+    return keys.isEmpty;
+  }
+
+  Future<bool> hasKey(String key) async {
+    var pref = await getInstance();
+    return  pref.containsKey(key);
+  }
+  
 }
