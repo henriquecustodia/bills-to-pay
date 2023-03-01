@@ -58,24 +58,11 @@ class SelectedMonthStore extends ValueNotifier<List<ReminderModel>> {
 
     selectedMonth = now;
 
-    await Db().setData(
-        toDbKey(
-          now.subtract(Duration(days: 30)),
-        ),
-        [
-          ReminderModel(
-            title: 'test 1',
-            endDate: DateTime(2023, DateTime.april, 20),
-          ),
-          ReminderModel(
-            title: 'test 2',
-            endDate: DateTime(2023, DateTime.november, 20),
-          )
-        ]);
-
     var reminders = await getOrCreateListInDb(now);
 
     value.addAll(reminders);
+
+    notifyListeners();
 
     return true;
   }
@@ -115,19 +102,19 @@ class SelectedMonthStore extends ValueNotifier<List<ReminderModel>> {
       return null;
     }
 
-    var firstDayOftheMonth = DateTime(dt.year, dt.month, 1);
+    var firstDayOfTheMonth = DateTime(dt.year, dt.month, 1);
 
     while (true) {
-      var previousMonth = firstDayOftheMonth.subtract(const Duration(days: 30));
-      firstDayOftheMonth = DateTime(previousMonth.year, previousMonth.month, 1);
+      var previousMonth = firstDayOfTheMonth.subtract(const Duration(days: 30));
+      firstDayOfTheMonth = DateTime(previousMonth.year, previousMonth.month, 1);
 
-      var hasKey = await Db().hasKey(toDbKey(firstDayOftheMonth));
+      var hasKey = await Db().hasKey(toDbKey(firstDayOfTheMonth));
 
       if (!hasKey) {
         continue;
       }
 
-      return await Db().getData(toDbKey(firstDayOftheMonth));
+      return await Db().getData(toDbKey(firstDayOfTheMonth));
     }
   }
 
@@ -139,8 +126,10 @@ class SelectedMonthStore extends ValueNotifier<List<ReminderModel>> {
         return;
       }
 
-      var firstDayOfEndDate = DateTime(element.endDate!.year, element.endDate!.month, 1);
-      var firstDayOfSelectedMonth = DateTime(selectedMonth.year, selectedMonth.month, 1);
+      var firstDayOfEndDate =
+          DateTime(element.endDate!.year, element.endDate!.month, 1);
+      var firstDayOfSelectedMonth =
+          DateTime(selectedMonth.year, selectedMonth.month, 1);
 
       if (firstDayOfEndDate.isBefore(firstDayOfSelectedMonth)) {
         return;

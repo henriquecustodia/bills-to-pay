@@ -4,7 +4,8 @@ import 'package:reminder/models/reminder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Db {
-  Future<SharedPreferences> getInstance() async => await SharedPreferences.getInstance();
+  Future<SharedPreferences> getInstance() async =>
+      await SharedPreferences.getInstance();
 
   Future<List<ReminderModel>?> getData(String key) async {
     var pref = await getInstance();
@@ -23,9 +24,15 @@ class Db {
   Future<bool> setData(String key, List<ReminderModel> reminders) async {
     var pref = await getInstance();
 
-    var remindersAsString =  jsonEncode(reminders);
+    var remindersAsString = jsonEncode(reminders);
 
     return pref.setString(key, remindersAsString);
+  }
+
+  Future<bool> clearData() async {
+    var pref = await getInstance();
+
+    return pref.clear();
   }
 
   Future<Map<String, List<ReminderModel>>> getAll() async {
@@ -44,17 +51,16 @@ class Db {
 
     return result as Future<Map<String, List<ReminderModel>>>;
   }
-  
+
   Future<bool> hasItems() async {
     var pref = await getInstance();
     var keys = pref.getKeys();
 
-    return keys.isEmpty;
+    return keys.isNotEmpty;
   }
 
   Future<bool> hasKey(String key) async {
     var pref = await getInstance();
-    return  pref.containsKey(key);
+    return pref.containsKey(key);
   }
-  
 }

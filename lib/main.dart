@@ -6,8 +6,9 @@ import 'pages/create.dart';
 import 'pages/list.dart';
 
 void main() async {
-  await SelectedMonthStore().init();
   runApp(const MyApp());
+  // Db().clearData();
+  await SelectedMonthStore().init();
 }
 
 class MyApp extends StatelessWidget {

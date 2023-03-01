@@ -4,7 +4,7 @@ x - Persistir lista
 
 x - Carregar lista quando app iniciar
 
-[WIP] - criar lista com base em uma copia do mes anterior
+[WIP] - criar lista com base em uma copia do mes anterior - (testar na próxima live) 
   - testar geracao da copia (aparentemente não ta funcionando)
 
 - adicionar o campo endDate ao formulario
