@@ -1,10 +1,11 @@
 Next steps: 
-  [x] Persistir lista
-  [x] Carregar lista quando app iniciar
+  ✔ Persistir lista @done(23-03-14 21:55)
   
-  [ ] criar lista com base em uma copia do mes anterior - (testar na próxima live) @started(23-03-10 18:03)
+  ✔ Carregar lista quando app iniciar @done(23-03-14 21:55)
   
-  [ ] testar geracao da copia (aparentemente não ta funcionando)
+  ✔ criar lista com base em uma copia do mes anterior - (testar na próxima live) @done(23-03-14 21:55)
+  
+  ✔ testar geracao da copia (aparentemente não ta funcionando) @done(23-03-14 21:55)
   
   [ ] adicionar o campo endDate ao formulario
   
@@ -18,3 +19,11 @@ Next steps:
   [ ] Criar agrupamento por mes, para permitir recorrencia mensal
   
   [ ] Usar um 'cron' para gerar os reminders de forma recorrente 
+
+Bugs: 
+   [ ] se o usuário voltar pra uma data menor que o dia de hoje através do system date, o código entra em loop infinito. 
+
+To do: 
+   [ ] Não usar null em retornos
+      - gianpaul18 "voce nunca deve retornar null, voce deve retornar uma excecao de erro tratada, voce poderia fazer isso throw Exception("No Data");"
+

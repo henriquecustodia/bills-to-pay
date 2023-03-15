@@ -7,7 +7,6 @@ import 'pages/list.dart';
 
 void main() async {
   runApp(const MyApp());
-  // Db().clearData();
   await SelectedMonthStore().init();
 }
 

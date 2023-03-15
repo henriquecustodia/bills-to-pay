@@ -12,13 +12,13 @@ class Db {
 
     var dataAsString = pref.get(key);
 
-    if (dataAsString == null || dataAsString == '()') {
+    if (dataAsString == null || dataAsString == '()' || dataAsString == '[]') {
       return null;
     }
 
-    var list = jsonDecode(dataAsString as String) as List;
-
-    return list.map((e) => ReminderModel.fromJson(e)).toList();
+    return List.from(jsonDecode(dataAsString as String))
+        .map((e) => ReminderModel.fromJson(e))
+        .toList();
   }
 
   Future<bool> setData(String key, List<ReminderModel> reminders) async {
@@ -40,16 +40,19 @@ class Db {
 
     var keys = pref.getKeys();
 
-    var result = keys.fold({}, (map, currentKey) {
+    Map<String, List<ReminderModel>> result = keys.fold({}, (map, currentKey) {
       var listAsString = pref.getString(currentKey) as String;
-      var reminders = jsonDecode(listAsString) as List<ReminderModel>;
+      var decodedJsonData = jsonDecode(listAsString);
+      var reminders = List.from(decodedJsonData)
+          .map((e) => ReminderModel.fromJson(e))
+          .toList();
 
       map.addAll({currentKey: reminders});
 
       return map;
     });
 
-    return result as Future<Map<String, List<ReminderModel>>>;
+    return Future(() => result);
   }
 
   Future<bool> hasItems() async {
