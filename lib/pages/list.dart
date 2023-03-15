@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reminder/models/change-page-arguments.dart';
-import 'package:reminder/services/store.dart';
+import 'package:reminder/services/selected-month-store.dart';
 import '../models/reminder.dart';
 
 class ListPage extends StatefulWidget {
@@ -84,7 +84,7 @@ class ListItem extends StatelessWidget {
                       Checkbox(
                         value: reminder.isCompleted,
                         onChanged: (value) {
-                          onChange!(value!);
+                          onChange(value!);
                         },
                       ),
                     ],
@@ -146,7 +146,7 @@ class ReminderList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<List<ReminderModel>>(
-      valueListenable: Store(),
+      valueListenable: SelectedMonthStore(),
       builder: (context, value, child) {
         return ListView.builder(
           itemCount: value.length,
@@ -178,11 +178,11 @@ class ReminderList extends StatelessWidget {
       id: reminder.id,
     );
 
-    Store().edit(newReminder);
+    SelectedMonthStore().edit(newReminder);
   }
 
   void removeItem(ReminderModel reminder) {
-    Store().remove(reminder);
+    SelectedMonthStore().remove(reminder);
   }
 
   void toEdit(BuildContext context, ReminderModel reminder) async {

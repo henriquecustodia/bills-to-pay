@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:reminder/services/db.dart';
+import 'package:reminder/services/selected-month-store.dart';
 import 'pages/create.dart';
 import 'pages/list.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
+  await SelectedMonthStore().init();
 }
 
 class MyApp extends StatelessWidget {
