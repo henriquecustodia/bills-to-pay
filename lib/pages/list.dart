@@ -43,7 +43,96 @@ class _ListPageState extends State<ListPage> {
           ),
         ],
       ),
-      floatingActionButton: createFloatingButton(), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton:
+          createFloatingButton(), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class ReminderList extends StatelessWidget {
+  const ReminderList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<List<ReminderModel>>(
+      valueListenable: SelectedMonthStore(),
+      builder: (context, value, child) {
+        var completedItems = value
+            .where((element) => element.isCompleted)
+            .map((reminder) => createListItem(reminder, context))
+            .toList();
+
+        var notCompletedItems = value
+            .where((element) => !element.isCompleted)
+            .map((reminder) => createListItem(reminder, context))
+            .toList();
+
+        var completedItemsHeader = Flex(
+          direction: Axis.horizontal,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text('Pago'),
+          ],
+        );
+
+        var notCompletedItemsHeader = Container(
+          margin: const EdgeInsets.only(top: 24),
+          child: Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Text('À Pagar'),
+            ],
+          ),
+        );
+
+        List<Widget> list = [];
+        list.add(notCompletedItemsHeader);
+        list.addAll(notCompletedItems);
+        list.add(completedItemsHeader);
+        list.addAll(completedItems);
+
+        return ListView(children: list);
+      },
+    );
+  }
+
+  ListItem createListItem(ReminderModel reminder, BuildContext context) {
+    return ListItem(
+      reminder: reminder,
+      onChange: (value) {
+        toggleTheCompletedReminderState(reminder);
+      },
+      onRemove: (reminder) {
+        removeItem(reminder);
+      },
+      onEdit: (reminder) {
+        toEdit(context, reminder);
+      },
+    );
+  }
+
+  void toggleTheCompletedReminderState(ReminderModel reminder) {
+    var newReminder = ReminderModel(
+      title: reminder.title,
+      isCompleted: !reminder.isCompleted,
+      id: reminder.id,
+    );
+
+    SelectedMonthStore().edit(newReminder);
+  }
+
+  void removeItem(ReminderModel reminder) {
+    SelectedMonthStore().remove(reminder);
+  }
+
+  void toEdit(BuildContext context, ReminderModel reminder) async {
+    await Navigator.pushNamed(
+      context,
+      '/change',
+      arguments: ChangePageArguments(
+        id: reminder.id!,
+      ),
     );
   }
 }
@@ -65,7 +154,7 @@ class ListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.amber,
+      color: Colors.black54,
       margin: const EdgeInsets.all(24),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -81,6 +170,7 @@ class ListItem extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      const Text('Pago'),
                       Checkbox(
                         value: reminder.isCompleted,
                         onChanged: (value) {
@@ -104,9 +194,9 @@ class ListItem extends StatelessWidget {
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                            ),
+                            // style: ElevatedButton.styleFrom(
+                            //     // backgroundColor: Colors.white,
+                            //     ),
                             onPressed: () => {
                               onEdit(reminder),
                             },
@@ -118,9 +208,9 @@ class ListItem extends StatelessWidget {
                           child: Align(
                             alignment: Alignment.topRight,
                             child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                ),
+                                // style: ElevatedButton.styleFrom(
+                                //     // backgroundColor: Colors.white,
+                                //     ),
                                 onPressed: () => {
                                       onRemove(reminder),
                                     },
@@ -135,62 +225,6 @@ class ListItem extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class ReminderList extends StatelessWidget {
-  const ReminderList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<ReminderModel>>(
-      valueListenable: SelectedMonthStore(),
-      builder: (context, value, child) {
-        return ListView.builder(
-          itemCount: value.length,
-          itemBuilder: (context, index) {
-            var reminder = value[index];
-
-            return ListItem(
-              reminder: reminder,
-              onChange: (value) {
-                toggleTheCompletedReminderState(reminder, index);
-              },
-              onRemove: (reminder) {
-                removeItem(reminder);
-              },
-              onEdit: (reminder) {
-                toEdit(context, reminder);
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void toggleTheCompletedReminderState(ReminderModel reminder, int index) {
-    var newReminder = ReminderModel(
-      title: reminder.title,
-      isCompleted: !reminder.isCompleted,
-      id: reminder.id,
-    );
-
-    SelectedMonthStore().edit(newReminder);
-  }
-
-  void removeItem(ReminderModel reminder) {
-    SelectedMonthStore().remove(reminder);
-  }
-
-  void toEdit(BuildContext context, ReminderModel reminder) async {
-    await Navigator.pushNamed(
-      context,
-      '/change',
-      arguments: ChangePageArguments(
-        id: reminder.id!,
       ),
     );
   }

@@ -19,8 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Contas a Pagar',
       theme: ThemeData(
-        primarySwatch: Colors.amber,
-        backgroundColor: Colors.white,
+        colorScheme: const ColorScheme.dark(),
       ),
       routes: {
         '/': (context) => const ListPage(),

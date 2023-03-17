@@ -7,23 +7,32 @@ Next steps:
   
   ✔ testar geracao da copia (aparentemente não ta funcionando) @done(23-03-14 21:55)
   
-  [ ] adicionar o campo endDate ao formulario
-  
-  [ ] adicionar seletor de mes 
-  
-  [ ] refatorar codigo
-     - abstrair de uma forma melhor a store 
-  
+  ✔ Agrupar reminder por `Pago` e `À Pagar`. @done(23-03-16 21:22)
+
+  [ ] Remover header `Pago` quando não tiver items
+
+  [ ] Remover header `À Pagar` quando não tiver items
+
   [ ] Mudar cor do reminder quando estiver completo
   
-  [ ] Criar agrupamento por mes, para permitir recorrencia mensal
+  [ ] adicionar seletor de mes
+
+  ✘ Usar um 'cron' para gerar os reminders de forma recorrente @cancelled(23-03-16 20:03)
   
-  [ ] Usar um 'cron' para gerar os reminders de forma recorrente 
-
 Bugs: 
+   
    [ ] se o usuário voltar pra uma data menor que o dia de hoje através do system date, o código entra em loop infinito. 
-
+   
 To do: 
-   [ ] Não usar null em retornos
-      - gianpaul18 "voce nunca deve retornar null, voce deve retornar uma excecao de erro tratada, voce poderia fazer isso throw Exception("No Data");"
-
+   
+   [ ] adicionar o campo endDate ao formulario
+      
+   [ ] Criar agrupamento por mes, para permitir recorrencia mensal
+      
+   ✘ refatorar codigo @cancelled(23-03-16 21:23)
+      ✘ abstrair de uma forma melhor a store @cancelled(23-03-16 21:23)
+      
+   ✘ Não usar null em retornos @cancelled(23-03-16 21:23)
+     ✘ gianpaul18 "voce nunca deve retornar null, voce deve retornar uma excecao de erro tratada, voce poderia fazer isso throw Exception("No Data");" @cancelled(23-03-16 21:24)
+         
+         
