@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:reminder/models/reminder.dart';
@@ -11,6 +13,10 @@ class SelectedMonthStore extends ValueNotifier<List<ReminderModel>> {
   late DateTime selectedMonth;
 
   factory SelectedMonthStore() => SelectedMonthStore._instance;
+
+  getFormattedSelectedMonth() {
+    return toDbKey(selectedMonth);
+  }
 
   void add(ReminderModel reminder) {
     value.add(reminder);
@@ -63,6 +69,20 @@ class SelectedMonthStore extends ValueNotifier<List<ReminderModel>> {
     value.addAll(reminders);
 
     notifyListeners();
+
+    return true;
+  }
+
+  Future<bool> set(String month) async {
+    var splitted = month.split('-');
+
+    selectedMonth = DateTime(int.parse(splitted[0]), int.parse(splitted[1]), 1);
+
+    var reminders = await Db().getData(month);
+
+    value = reminders as List<ReminderModel>;
+
+    // notifyListeners();
 
     return true;
   }

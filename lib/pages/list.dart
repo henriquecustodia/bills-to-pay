@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:reminder/models/change-page-arguments.dart';
+import 'package:reminder/services/db.dart';
 import 'package:reminder/services/selected-month-store.dart';
 import '../models/reminder.dart';
 
@@ -13,16 +14,16 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  void toCreate() async {
-    await Navigator.pushNamed(context, 'create');
-  }
+  var months;
+  var selectedMonth;
 
-  FloatingActionButton createFloatingButton() {
-    return FloatingActionButton(
-      onPressed: () => toCreate(),
-      tooltip: 'Adicionar',
-      child: const Icon(Icons.add),
-    );
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    // months = await Db().getKeys();
+    selectedMonth = SelectedMonthStore().getFormattedSelectedMonth();
   }
 
   @override
@@ -37,14 +38,35 @@ class _ListPageState extends State<ListPage> {
         title: Text(widget.title),
       ),
       body: Column(
-        children: const [
+        children: [
+          DropdownButtonExample(
+            months: ['2017-03', '2017-04', '2017-05'],
+            selectedMonth: selectedMonth,
+            onSelectMonth: onSelectMonth,
+          ),
           Expanded(
-            child: ReminderList(),
+            child: const ReminderList(),
           ),
         ],
       ),
       floatingActionButton:
           createFloatingButton(), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  void onSelectMonth(String month) {
+    SelectedMonthStore().set(month);
+  }
+
+  void toCreate() async {
+    await Navigator.pushNamed(context, 'create');
+  }
+
+  FloatingActionButton createFloatingButton() {
+    return FloatingActionButton(
+      onPressed: () => toCreate(),
+      tooltip: 'Adicionar',
+      child: const Icon(Icons.add),
     );
   }
 }
@@ -67,12 +89,16 @@ class ReminderList extends StatelessWidget {
             .map((reminder) => createListItem(reminder, context))
             .toList();
 
-        var completedItemsHeader = Flex(
-          direction: Axis.horizontal,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text('Pago'),
-          ],
+        var completedItemsHeader = Container(
+          margin:
+              notCompletedItems.isEmpty ? const EdgeInsets.only(top: 24) : null,
+          child: Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Text('Pago'),
+            ],
+          ),
         );
 
         var notCompletedItemsHeader = Container(
@@ -87,10 +113,16 @@ class ReminderList extends StatelessWidget {
         );
 
         List<Widget> list = [];
-        list.add(notCompletedItemsHeader);
-        list.addAll(notCompletedItems);
-        list.add(completedItemsHeader);
-        list.addAll(completedItems);
+
+        if (notCompletedItems.isNotEmpty) {
+          list.add(notCompletedItemsHeader);
+          list.addAll(notCompletedItems);
+        }
+
+        if (completedItems.isNotEmpty) {
+          list.add(completedItemsHeader);
+          list.addAll(completedItems);
+        }
 
         return ListView(children: list);
       },
@@ -226,6 +258,59 @@ class ListItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class DropdownButtonExample extends StatefulWidget {
+  const DropdownButtonExample({
+    super.key,
+    required this.months,
+    required this.selectedMonth,
+    required this.onSelectMonth,
+  });
+
+  final List<String> months;
+  final String selectedMonth;
+  final Function(String) onSelectMonth;
+
+  @override
+  State<DropdownButtonExample> createState() => _DropdownButtonExampleState();
+}
+
+class _DropdownButtonExampleState extends State<DropdownButtonExample> {
+  String? selectedValue;
+
+  @override
+  void initState() {
+    selectedValue = widget.selectedMonth;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      value: selectedValue,
+      icon: const Icon(Icons.arrow_downward),
+      elevation: 16,
+      style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String? value) {
+        // This is called when the user selects an item.
+        setState(() {
+          selectedValue = value;
+          widget.onSelectMonth(value as String);
+        });
+      },
+      items: widget.months.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
     );
   }
 }

@@ -66,4 +66,9 @@ class Db {
     var pref = await getInstance();
     return pref.containsKey(key);
   }
+
+  Future<List<String>> getKeys() async {
+    var map = await Db().getAll();
+    return map.keys.toList();
+  }
 }

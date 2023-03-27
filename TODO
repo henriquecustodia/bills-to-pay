@@ -9,14 +9,16 @@ Next steps:
   
   ✔ Agrupar reminder por `Pago` e `À Pagar`. @done(23-03-16 21:22)
 
-  [ ] Remover header `Pago` quando não tiver items
+  ✔ Remover header `Pago` quando não tiver items @started(23-03-26 20:25) @done(23-03-26 20:35) @lasted(10m8s)
 
-  [ ] Remover header `À Pagar` quando não tiver items
+  ✔ Remover header `À Pagar` quando não tiver items @done(23-03-26 20:35)
 
+  [ ] adicionar seletor de mes
+      [ ] corrigir erro ao usar DropdownMenu
+      [ ] Ver uma altertiva para pegar os meses do banco
+  
   [ ] Mudar cor do reminder quando estiver completo
   
-  [ ] adicionar seletor de mes
-
   ✘ Usar um 'cron' para gerar os reminders de forma recorrente @cancelled(23-03-16 20:03)
   
 Bugs: 
